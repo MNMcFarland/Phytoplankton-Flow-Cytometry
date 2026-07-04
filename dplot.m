@@ -113,7 +113,8 @@ end
 % [H,Z]=bivHist(X+1,Y+1,Xedg,Yedg);
 [H,~,~,bx,by] = histcounts2(X,Y,Xedg,Yedg);
 % Z = H(sub2ind(size(H),bx,by));
-fnt = isfinite(X) & isfinite(Y);
+% fnt = isfinite(X) & isfinite(Y);
+fnt = isfinite(X) & isfinite(Y) & bx>0 & by>0; % modified from above 2026-07-04, MMcFarland
 Z1 = H(sub2ind(size(H),bx(fnt),by(fnt)));
 Z = NaN(size(X));
 Z(fnt) = Z1;
