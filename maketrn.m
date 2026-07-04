@@ -28,6 +28,7 @@ for m = 1:length(fnames)
     Y = [Y; ws(n).lbl(nzl)]; % concatenate and remove zero labels
     
     fcdat = readAccuri(fnames{m});
+    if istable(fcdat); fcdat = table2array(fcdat); end
     X1 = log10(fcdat(:,ord)+1);
     X = [X; X1(nzl,:)]; % concatenate and remove zero labels
 end
