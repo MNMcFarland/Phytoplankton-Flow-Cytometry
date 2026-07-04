@@ -7,7 +7,7 @@ function [G,idx,h] = rectgate(dat,cols,varargin)
 %
 % USAGE: [G,ind,h] = rectgate(dat,cols,'property',value,...)
 %
-%   [G,ind,h] = polygate(dat,cols,'property1',value1,'property2',value2,...) 
+%   [G,ind,h] = rectgate(dat,cols,'property1',value1,'property2',value2,...) 
 %   Generates a new plot from tabular data in 'dat'. 
 %   Returns indices of gated data in 'ind'. 
 %   Also returns handle of gate object in 'h'. 
@@ -20,7 +20,7 @@ function [G,idx,h] = rectgate(dat,cols,varargin)
 %   ----------------------------------------------------------------
 %       'gates'  - gate structure with fields: cols, x, y, parent, name. 
 %               Parent gates must precede children in gates structure. 
-%       'lbl'    - x and y axes labels (2 element cell array of strings)
+%       'lbl'    - x and y axes labels (2 element cell array of char vectors)
 %       'number' - gate number (scalar)
 %       'parent' - parent gate number (scalar), events in the gated region must
 %               also be inside the parent gate
