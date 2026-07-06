@@ -32,8 +32,6 @@ function [idx, lbv] = gateplot(dat,cols,G,varargin)
 % Harbor Branch Oceanographic Institute, Florida Atlantic University
 % mmcfarland@fau.edu
 
-if istable(dat); dat = table2array(dat); end
-
 % parse optional input
 if length(varargin)/2 ~= round(length(varargin)/2)
     error('gateplot: unpaired property - value inputs')

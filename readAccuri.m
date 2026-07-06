@@ -40,4 +40,4 @@ for n=1:length(d)
 end
 hdr=hdr(cid);
 
-dat = array2table(dat,'VariableNames',matlab.lang.makeValidName(hdr));
+% tbl = array2table(dat,'VariableNames',matlab.lang.makeVariableName(hdr));

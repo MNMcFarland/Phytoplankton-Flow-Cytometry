@@ -195,8 +195,6 @@ function [X,vol,hdr] = FC_read(name,ord,typ)
 
 [dat,vol,hdr] = readAccuri(name);
 
-if istable(dat); dat = table2array(dat); end
-
 if exist('typ','var') && typ=='A'
     hdr = hdr(ord);
     X = dat(:,ord);
