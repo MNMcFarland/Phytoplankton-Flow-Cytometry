@@ -33,11 +33,12 @@ dat=[];
 vol=0;
 for n=1:length(d)
     [dat1,hdr,fcshdr] = readfcs([d(n).folder filesep d(n).name]);
-%     dat1 = dat1(all(dat1(:,[7 8 10 11 12])>10,2),:); % all height parameters > 10
-    dat1 = dat1(:,cid);
+    % dat1 = dat1(:,cid);
     dat = [dat; dat1];
     vol = vol + fcshdr.vol;
 end
-hdr=hdr(cid);
+dat(:,1:12) = log10(dat(:,1:12)+1); % log convert
+dat = dat(:,cid); % select parameter type
+hdr = hdr(cid);
 
-dat = array2table(dat,'VariableNames',matlab.lang.makeValidName(hdr));
+dat = array2table(dat,'VariableNames',matlab.lang.makeValidName(hdr)); % make table

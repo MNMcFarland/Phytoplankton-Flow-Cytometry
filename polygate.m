@@ -1,4 +1,4 @@
-function [G,idx,h] = polygate(dat,cols,varargin)
+function [G,idx,h] = polygate(dat,var,varargin)
 
 % Interactively draw polygonal gate on plot and return vertices.
 % Returns gate vertex coordinates in gates structure G.
@@ -7,14 +7,14 @@ function [G,idx,h] = polygate(dat,cols,varargin)
 %
 % USAGE: [G,ind,h] = polygate(dat,cols,'property',value,...)
 %
-%   [G,ind,h] = polygate(dat,cols,'property1',value1,'property2',value2,...) 
-%   Generates a new plot from tabular data in 'dat'. 
-%   Returns indeces of gated data in 'ind'. 
+%   [G,ind,h] = polygate(dat,{'par1','par2'},'property1',value1,'property2',value2,...) 
+%   Generates a new plot from data in table 'dat'. 
+%   Returns row indeces of gated data in 'ind'. 
 %   Also returns handle of gate object in 'h'. 
 %
 % INPUT:
-%   dat - data matrix (events x parameters)
-%   cols - columns of data to gate, 2 element vector
+%   dat - data table (events x parameters)
+%   cols - variables of data to gate, 2 element cell or vector
 %
 %   Property - Value pair arguments (optional)
 %   ----------------------------------------------------------------
@@ -36,12 +36,19 @@ function [G,idx,h] = polygate(dat,cols,varargin)
 % Harbor Branch Oceanographic Institute, Florida Atlantic University
 % mmcfarland@fau.edu
 
-lbl = {['parameter ' num2str(cols(1))],['parameter '  num2str(cols(2))]}; 
+% lbl = {['parameter ' num2str(cols(1))],['parameter '  num2str(cols(2))]}; 
+if istable(dat) && isnumeric(var)
+    cols{1} = dat.Properties.VariableNames{var(1)};
+    cols{2} = dat.Properties.VariableNames{var(2)};
+else
+    cols = var;
+end
+lbl = cols; 
 par = [];
 
 % parse input
 if nargin/2~=round(nargin/2)
-    error('polygate: unpaired inputs')
+    error('polygate: unpaired property/value inputs')
 end
 for m=1:2:length(varargin)
     if ischar(varargin{m})
@@ -67,8 +74,8 @@ end
 % set defaults
 if ~exist('G','var') || isempty(G)
     if ~exist('nm','var'); nm = 'gate 1'; end
-    G = struct('cols',cols,'x',[],'y',[],'name',nm,'parent',[],'color',[0 0 0]);
     if ~exist('n','var'); n = 1; end
+    G = struct('cols',[],'x',[],'y',[],'name',nm,'parent',[],'color',[0 0 0]);
 end
 if ~exist('n','var'); n = length(G)+1; end % increment gate number if not provided
 if ~exist('nm','var'); nm = ['gate ' num2str(n)]; end

@@ -1,4 +1,4 @@
-function [idx, lbv] = gateplot(dat,cols,G,varargin)
+function [idx, lbv] = gateplot(dat,var,G,varargin)
 
 % Plot gated data set.
 % Use with log transformed flow cytometry data
@@ -7,8 +7,8 @@ function [idx, lbv] = gateplot(dat,cols,G,varargin)
 % USAGE: [idx,lbv] = gateplot(dat,cols,G,'property',value,...)
 %
 % INPUT:
-%   dat - flow cyt data set: events x parameters
-%   cols - columns of dat to plot (2 element vector)
+%   dat - flow cyt data table: events x parameters
+%   cols - variables of dat to plot (2 element cell)
 %   G - gates structure (from polygate.m) with fields: 
 %       cols - columns of dat  
 %       x, y - gate vertices (vectors). Vertices must be ordered.
@@ -32,7 +32,13 @@ function [idx, lbv] = gateplot(dat,cols,G,varargin)
 % Harbor Branch Oceanographic Institute, Florida Atlantic University
 % mmcfarland@fau.edu
 
-if istable(dat); dat = table2array(dat); end
+% if istable(dat); dat = table2array(dat); end
+if istable(dat) && isnumeric(var)
+    cols{1} = dat.Properties.VariableNames{var(1)};
+    cols{2} = dat.Properties.VariableNames{var(2)};
+else
+    cols = var;
+end
 
 % parse optional input
 if length(varargin)/2 ~= round(length(varargin)/2)
@@ -58,18 +64,24 @@ end
 if ~exist('xscale','var') || isempty(xscale); xscale='lin'; end
 if ~exist('yscale','var') || isempty(yscale); yscale='lin'; end
 if ~exist('lbl','var') || isempty(lbl)
-    lbl = {['parameter ' num2str(cols(1))], ['parameter ' num2str(cols(2))]}; 
+    % lbl = {['parameter ' num2str(cols(1))], ['parameter ' num2str(cols(2))]}; 
+    lbl = cols; 
     ovrd = true; % override these auto generated labels if possible
 end
 
 %%
 % [~,D0,~,h] = kde2(dat(:,cols(1)),dat(:,cols(2)),'sd',1,'sz',256,'p',2);
-[h,~,D0] = dplot(dat(:,cols(1)),dat(:,cols(2)),'xscale',xscale,'yscale',yscale); % density plot all the data
-mn1 = min(dat(:,cols(1)));
-mx1 = max(dat(:,cols(1)));
+% [h,~,D0] = dplot(dat(:,cols(1)),dat(:,cols(2)),'xscale',xscale,'yscale',yscale); % density plot all the data
+[h,~,D0] = dplot(dat.(cols{1}),dat.(cols{2}),'xscale',xscale,'yscale',yscale); % density plot all the data
+% mn1 = min(dat(:,cols(1)));
+% mx1 = max(dat(:,cols(1)));
+mn1 = min(dat.(cols{1}));
+mx1 = max(dat.(cols{1}));
 pd1 = 0.1*(mx1 - mn1); % pad from data range for x axis
-mn2 = min(dat(:,cols(2)));
-mx2 = max(dat(:,cols(2)));
+% mn2 = min(dat(:,cols(2)));
+% mx2 = max(dat(:,cols(2)));
+mn2 = min(dat.(cols{2}));
+mx2 = max(dat.(cols{2}));
 pd2 = 0.1*(mx2 - mn2); % pad from data range for y axis
 set(gca,'xlim',[mn1-pd1 mx1+pd1],'ylim',[mn2-pd2 mx2+pd2])
 % set(gca,'xlim',[min(dat(:,cols(1)))*.9 max(dat(:,cols(1)))*1.1],...
@@ -81,8 +93,8 @@ D0 = log10(D0+1);
 h.CData = [1 1 1] .* D0/max(D0);
 hold on
 % if exist('lbl','var') && ~isempty(lbl) && iscell(lbl)
-    xlabel(lbl{1})
-    ylabel(lbl{2})
+    xlabel(lbl{1},'interpreter','none')
+    ylabel(lbl{2},'interpreter','none')
 % end
 
 % cmap = lines(length(G));
@@ -91,7 +103,8 @@ idx = false(size(dat,1),length(G));
 h = zeros(length(G),1);
 for n = 1:length(G)
     if ~isempty(G(n).x)
-        ind = inpolygon(dat(:,G(n).cols(1)), dat(:,G(n).cols(2)), G(n).x, G(n).y); % determine events inside gate
+        % ind = inpolygon(dat(:,G(n).cols(1)), dat(:,G(n).cols(2)), G(n).x, G(n).y); % determine events inside gate
+        ind = inpolygon(dat.(G(n).cols{1}), dat.(G(n).cols{2}), G(n).x, G(n).y); % determine events inside gate
         if sum(ind)>0
             if G(n).parent
                 if G(n).parent >= n
@@ -101,7 +114,8 @@ for n = 1:length(G)
                 end
             end
 %             [~,D,~,h(n)] = kde2(dat(ind,cols(1)), dat(ind,cols(2)),'sd',1,'sz',256,'p',2); 
-            [h1,~,D] = dplot(dat(ind,cols(1)), dat(ind,cols(2)),'xscale',xscale,'yscale',yscale);
+            % [h1,~,D] = dplot(dat(ind,cols(1)), dat(ind,cols(2)),'xscale',xscale,'yscale',yscale);
+            [h1,~,D] = dplot(dat{ind,cols{1}}, dat{ind,cols{2}},'xscale',xscale,'yscale',yscale);
             if ~isempty(D)
                 h(n) = h1;
                 D = log10(D+1);
@@ -114,7 +128,8 @@ for n = 1:length(G)
         else
             ind = 0;
         end
-        if G(n).cols(1)==cols(1) && G(n).cols(2)==cols(2) % if gate columns match plot axes
+        % if G(n).cols(1)==cols(1) && G(n).cols(2)==cols(2) % if gate columns match plot axes
+        if matches(G(n).cols{1},cols{1}) && matches(G(n).cols{2},cols{2}) % if gate columns match plot axes
             line([G(n).x; G(n).x(1)],[G(n).y; G(n).y(1)],'color',G(n).color,'linewidth',1.5); % draw gate as line
             if ovrd && isfield(G,'xlbl') && ~isempty(G(n).xlbl); xlabel(G(n).xlbl); end
             if ovrd && isfield(G,'ylbl') && ~isempty(G(n).ylbl); ylabel(G(n).ylbl); end

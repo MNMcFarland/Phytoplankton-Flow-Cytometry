@@ -1,4 +1,4 @@
-function [G,idx,h] = rectgate(dat,cols,varargin)
+function [G,idx,h] = rectgate(dat,var,varargin)
 
 % Interactively draw rectangular gate on plot and return vertices.
 % Returns gate vertex coordinates in gates structure G.
@@ -36,7 +36,14 @@ function [G,idx,h] = rectgate(dat,cols,varargin)
 % Harbor Branch Oceanographic Institute, Florida Atlantic University
 % mmcfarland@fau.edu
 
-lbl = {['parameter ' num2str(cols(1))],['parameter '  num2str(cols(2))]}; 
+% lbl = {['parameter ' num2str(cols(1))],['parameter '  num2str(cols(2))]}; 
+if istable(dat) && isnumeric(var)
+    cols{1} = dat.Properties.VariableNames{var(1)};
+    cols{2} = dat.Properties.VariableNames{var(2)};
+else
+    cols = var;
+end
+lbl = cols; 
 par = [];
 
 % parse input
@@ -67,8 +74,8 @@ end
 % set defaults
 if ~exist('G','var') || isempty(G)
     if ~exist('nm','var'); nm = 'gate 1'; end
-    G = struct('cols',cols,'x',[],'y',[],'name',nm,'parent',[],'color',[0 0 0]);
     if ~exist('n','var'); n = 1; end
+    G = struct('cols',[],'x',[],'y',[],'name',nm,'parent',[],'color',[0 0 0]);
 end
 if ~exist('n','var'); n = length(G)+1; end % increment gate number if not provided
 if ~exist('nm','var'); nm = ['gate ' num2str(n)]; end
