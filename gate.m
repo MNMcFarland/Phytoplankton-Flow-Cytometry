@@ -27,7 +27,8 @@ function [idx,lbv] = gate(dat,G)
 idx = false(size(dat,1),length(G));
 for n = 1:length(G)
     if ~isempty(G(n).x)
-        ind = inpolygon(dat(:,G(n).cols(1)), dat(:,G(n).cols(2)), G(n).x, G(n).y); % determine events inside gate
+        % ind = inpolygon(dat(:,G(n).cols(1)), dat(:,G(n).cols(2)), G(n).x, G(n).y); % determine events inside gate
+        ind = inpolygon(dat.(G(n).cols{1}), dat.(G(n).cols{2}), G(n).x, G(n).y); % determine events inside gate
         if sum(ind)>0
             if G(n).parent
                 if G(n).parent >= n
