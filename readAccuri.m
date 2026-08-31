@@ -41,4 +41,5 @@ dat(:,1:12) = log10(dat(:,1:12)+1); % log convert
 dat = dat(:,cid); % select parameter type
 hdr = hdr(cid);
 
-dat = array2table(dat,'VariableNames',matlab.lang.makeValidName(hdr)); % make table
+hdr = matlab.lang.makeValidName(hdr);
+dat = array2table(dat,'VariableNames',hdr); % make table

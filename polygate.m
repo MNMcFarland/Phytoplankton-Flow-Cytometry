@@ -79,8 +79,8 @@ if ~exist('G','var') || isempty(G)
 end
 if ~exist('n','var'); n = length(G)+1; end % increment gate number if not provided
 if ~exist('nm','var'); nm = ['gate ' num2str(n)]; end
-if ~exist('c','var'); c = lines(n); end
-% if ~exist('c','var'); cmap = lines; c = cmap(n,:); end
+% if ~exist('c','var'); c = lines(n); end
+if ~exist('c','var'); cmap = lines; c = cmap(n,:); end
 
 %% plot all data and existing gates
 figure
