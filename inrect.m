@@ -2,7 +2,7 @@ function [in,x,y] = inrect(xq,yq,r)
 
 % determine points located inside or on edge of rectangle region
 %
-% USAGE: [in,on] = inrect(xq,yq,r)
+% USAGE: [in,x,y] = inrect(xq,yq,r)
 %
 % INPUT:
 %   xq - x-coordinates of query points (vector)

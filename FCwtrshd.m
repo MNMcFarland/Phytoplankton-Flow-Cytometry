@@ -262,8 +262,9 @@ for m = 1:fnum
     mu = zeros(ngrp,nd);
     sigma = zeros(nd,nd,ngrp);
     cnt = zeros(ngrp,1);
-    [X,vol,hdr] = FC_read([fnm(m).folder filesep fnm(m).name], 1:12, 'A');
-    X(:,ord) = log10(1+X(:,ord));
+    [X,vol,hdr] = FC_read([fnm(m).folder filesep fnm(m).name], 1:12);
+    % [X,vol,hdr] = FC_read([fnm(m).folder filesep fnm(m).name], 1:12, 'A');
+    % X(:,ord) = log10(1+X(:,ord));
     for n = unique(dat(m).lbl(dat(m).lbl>0)')
         idx = dat(m).lbl==n;
         mu(n,:) = mean(X(idx,ord));
@@ -291,19 +292,19 @@ end
 
 delete(wb)
 
-function [X,vol,hdr] = FC_read(name,ord,typ)
+function [X,vol,hdr] = FC_read(name,ord)%,typ)
 
 [dat,vol,hdr] = readAccuri(name);
 
 if istable(dat); dat = table2array(dat); end
 
-if exist('typ','var') && typ=='A'
-    hdr = hdr(ord);
-    X = dat(:,ord);
-else
+% if exist('typ','var') && typ=='A'
+%     hdr = hdr(ord);
+%     X = dat(:,ord);
+% else
     hdr = hdr(ord);
     X = dat(:,ord);
     % X = log10(1+dat(:,ord)); % log convert (moved to readAccuri)
-end
+% end
     
 

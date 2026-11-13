@@ -202,7 +202,7 @@ if exist('typ','var') && typ=='A'
     X = dat(:,ord);
 else
     hdr = hdr(ord);
-    X = log10(1+dat(:,ord)); % log convert
+    X = dat(:,ord);
+    % X = log10(1+dat(:,ord)); % log convert
 end
-
 

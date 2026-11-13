@@ -17,7 +17,7 @@ function [mdl,cfg] = FCtrain(fin,varargin)
 %       'radius' - neighborhood radius, default = 0.45
 %       'minsz' - minimum density (number of events) in a cluster, default = 5
 %       'meta' - optional logical flag for metaclustering, true = do metacluster analysis (default = false)
-%       'metaradius' - metacluster neighborhood radius, default = 0.5
+%       'metaradius' - metacluster neighborhood radius, default = 0.6
 %       'cnf' - if not empty, plot confusion matrix up to the specified label, default = [] 
 %
 % OUTPUT:
@@ -107,20 +107,29 @@ else % select files for training set manually
     end
 end
 
+% do metaclustering for multiple input files
+if ~isfield(cfg,'meta') && length(fnm)==1
+    cfg.meta = false;
+elseif ~isfield(cfg,'meta') && length(fnm)>1
+    cfg.meta = true;
+end
+
 %% compile training data
 % if prp<1, randomly select proportion of data, weighted according to probability density
 X = [];
 Y = [];
 if ~isfield(fnm,'lbl')
     fnm = FCwtrshd(fnm,'radius',cfg.r,'order',cfg.ord,'printplots',false,...
-        'meta',true,'metaradius',cfg.mr,'minsz',cfg.minsz,'metaminsz',1);
+        'meta',cfg.meta,'metaradius',cfg.mr,'minsz',cfg.minsz,'metaminsz',1);
 end
 
 for m = 1:length(fnm)
     raw = readAccuri([fnm(m).folder filesep fnm(m).name]);
-    raw = raw(:,cfg.ord);
+    % raw = raw(:,cfg.ord);
+    raw = table2array(raw(:,cfg.ord));
     z = any(raw<=0,2); % identify events with zeros
-    X1 = log10(1+raw(~z,:)); % log convert and remove zeros
+    % X1 = log10(1+raw(~z,:)); % log convert and remove zeros
+    X1 = raw(~z,:); % remove zeros
     if cfg.prp<1
         n = size(X1,1);
         D = fnm(m).D(~z);

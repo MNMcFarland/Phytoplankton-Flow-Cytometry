@@ -25,17 +25,31 @@ if ~exist('f','var') || isempty(f); f = [2 3]; end
 % idx = contains({d.name},{'_son',' Pre',' Post',' Dec','clog'},IgnoreCase=true); % ignore these files
 % d = d(~idx);
 
-sb = regexp({d.name},'\s0?([A-Za-z0-9]+)_?0?([A-Za-z0-9]*)_?0?([A-Za-z0-9]*)_?0?([A-Za-z0-9]*)','tokens'); % extract site and bottle IDs as tokens
-sb = vertcat(sb{:});
-sb = vertcat(sb{:});
-sb(contains(sb,'son')) = {''}; % get rid of son/unson
-sb = string(sb);
+% extract site and bottle IDs
+for m = 1:length(d)
+    s = split(d(m).name,{' ','_','.'})';
+    for n = 1:length(s)
+        sb{m,n} = s{n};
+    end
+end
+sb = sb(:,2:end-1);
+% pat = alphanumericsPattern;
+% sb = extract({d.name},pat);
+% sb = regexp({d.name},'\s0?([A-Za-z0-9]+)_?0?([A-Za-z0-9]*)_?0?([A-Za-z0-9]*)_?0?([A-Za-z0-9]*)','tokens'); 
+% sb = vertcat(sb{:});
+% sb = vertcat(sb{:});
+% sb(contains(sb,'son')) = {''}; % get rid of son/unson
+% sb = string(sb);
 
-sd = regexp({d.folder},'_?(\d{4})-?(\d{2})-?(\d{2})','tokens'); % get sample date from folder names
-sd = vertcat(sd{:});
-sd = vertcat(sd{:});
-sd = strcat(sd(:,1),sd(:,2),sd(:,3)); % concatenate year month day
-sd = string(sd);
+% get sample date from folder names
+pat = digitsPattern(4) + "-" + digitsPattern(2) + "-" + digitsPattern(2);
+sd = extract({d.folder}',pat);
+sd = erase(sd,"-");
+% sd = regexp({d.folder},'_?(\d{4})-?(\d{2})-?(\d{2})','tokens','once'); 
+% sd = vertcat(sd{:});
+% sd = vertcat(sd{:});
+% sd = strcat(sd(:,1),sd(:,2),sd(:,3)); % concatenate year month day
+% sd = string(sd);
 
 key = prj + "_" + sd + "_" + sb(:,f(1)); % concatenate project, date, and siteID
 
