@@ -1,14 +1,15 @@
-function [dat,vol,hdr]=readAccuri(fin,p)
+function [dat,vol,hdr]=readAccuri(fin,p,lc)
 
 % Read in data from Accuri C6 flow cytometer
 % Concatenates multiple files
 % Requires readfcs.m
 %
-% USAGE: [dat,vol,hdr] = readAccuri(fin,p)
+% USAGE: [dat,vol,hdr] = readAccuri(fin,p,lc)
 %
 % INPUT:
 %   fin - input file name (string) or directory structure
 %   p - optional parameter type indicator: 'H' for height or 'A' for area
+%   lc - optional boolean flag to log convert data, default = true
 %
 % OUTPUT:
 %   dat - listmode data
@@ -29,6 +30,10 @@ elseif p=='A'
     cid=[1 2 3 4 5 6]; % Area parameters
 end
 
+if ~exist('lc','var') || isempty(lc)
+    lc = true;
+end
+
 dat=[];
 vol=0;
 for n=1:length(d)
@@ -37,7 +42,11 @@ for n=1:length(d)
     dat = [dat; dat1];
     vol = vol + fcshdr.vol;
 end
-dat(:,1:12) = log10(dat(:,1:12)+1); % log convert
+
+if lc
+    dat(:,1:12) = log10(dat(:,1:12)+1); % log convert
+end
+
 dat = dat(:,cid); % select parameter type
 hdr = hdr(cid);
 
